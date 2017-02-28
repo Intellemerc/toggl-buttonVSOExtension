@@ -1,15 +1,15 @@
 {
   "manifestVersion": 1,
-  "version": "1.1",
-  "name": "Toggl Button",
-  "id": "TogglButton",
+  "version": "1.0.0",
+  "name": "Toggl Time Tracker",
+  "id": "TogglTimeTracker",
   "description": "VSTS and toggl.com integration",
   "provider": {
-    "name": "Gerson Dias"
+    "name": "Yury Nevalenny"
   },
-  "publisher": "GersonDias",
+  "publisher": "nevalenny",
   "baseUri": "https://vso-toggl.azurewebsites.net",
-  "public": true,
+  "public": false,
   "categories": [
     "Plan and track"
   ],
@@ -40,13 +40,13 @@
       "uri": "aka.ms/vsoext12"
     },
     "repository": {
-      "uri": "https://github.com/GersonDias/toggl-buttonVSOExtension"
+      "uri": "https://github.com/nevalenny/toggl-buttonVSOExtension"
     },
     "issues": {
-      "uri": "https://github.com/GersonDias/toggl-buttonVSOExtension/issues"
+      "uri": "https://github.com/nevalenny/toggl-buttonVSOExtension/issues"
     },
     "support": {
-      "uri": "https://github.com/GersonDias/toggl-buttonVSOExtension/issues"
+      "uri": "https://github.com/nevalenny/toggl-buttonVSOExtension/issues"
     },
     "learn": {
       "uri": "aka.ms/vsoext12"
