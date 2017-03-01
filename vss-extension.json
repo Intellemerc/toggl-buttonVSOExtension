@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.1",
+  "version": "1.0.4",
   "name": "Toggl Time Tracker",
   "id": "TogglTimeTracker",
   "description": "VSTS and toggl.com integration",
@@ -8,7 +8,7 @@
     "name": "Yury Nevalenny"
   },
   "publisher": "nevalenny",
-  "baseUri": "https://vso-toggl.azurewebsites.net",
+  "baseUri": "https://vsts-toggl.herokuapp.com",
   "public": false,
   "categories": [
     "Plan and track"
