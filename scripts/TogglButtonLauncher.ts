@@ -49,14 +49,15 @@ class TogglButtonDialogLauncher {
                                 height: 400,
                                 okText: "Start",
                                 okCallback: function(result: ITogglFormResponse) {
-                                    /// TODO: Call Toggl.com to start the activity
-                                    console.log('Starting time in toggl.com');
+                                    
+                                    console.log('Start tracking time at toggl.com');
                                     $.ajax({
                                         url: './togglButtonForm/startTimer',
                                         method: 'POST',
                                         data: result,
-                                        success: function(data) {
+                                        success: function(startTimerData) {
                                             alert('Timer started successfully');
+
                                             $('li[command="TogglButton"]').find('img').attr('src', 'https://localhost:43000/images/active-16.png')
                                             
                                             var authTokenManager = AuthenticationService.authTokenManager;
@@ -68,7 +69,7 @@ class TogglButtonDialogLauncher {
                                                     var postData = [{
                                                         'op': 'add',
                                                         'path': '/fields/System.History',
-                                                        'value': 'Toggl.com timer started'
+                                                        'value': 'Toggl.com timer started at: ' + new Date().toISOString()
                                                     }];
                                                     
                                                     if (result.nextState){
@@ -79,7 +80,7 @@ class TogglButtonDialogLauncher {
                                                         }]);
                                                     }
                                                     
-                                                    var apiURI = webContext.collection.uri + "_apis/wit/workitems/" + workItem.id + "?api-version=1.0";
+                                                    var apiURI = webContext.collection.uri + '_apis/wit/workitems/' + workItem.id + '?api-version=1.0';
                                                     
                                                     $.ajax({
                                                         type: 'PATCH',
@@ -115,6 +116,8 @@ class TogglButtonDialogLauncher {
                             dialogSvc.openDialog(dialogContributionId, dialogOptions, contributionContext).then(function(dialog: IExternalDialog) {
                                 dialog.getContributionInstance("TogglButtonForm").then(function(togglButtonFormInstance: TogglButtonForm) {
                                     togglBtnForm = togglButtonFormInstance;
+                                    togglBtnForm.workItem = workItem;
+                                    togglBtnForm.webContext = webContext;
 
                                     togglBtnForm.onFormChanged(function(formInput) {
                                         dialog.updateOkButton(formInput.primaryId > 0);

@@ -44,6 +44,68 @@ router.get('/getUserData', function (req, res, next) {
     }).end();
 });
 
+router.get('/entryDetails', function (req, res, next) {
+    var https = require('https');
+    var options = {
+        host: 'toggl.com',
+        path: '/api/v8/time_entries/' + req.body.timeEntryId,
+        headers: {
+            'Authorization': 'Basic ' + new Buffer(req.query['apikey'] + ':api_token').toString('base64'),
+            'Content-Type': 'application/json'
+        },
+        method: 'GET'
+    };
+
+    var togglReq = https.request(options, function (response) {
+        var str = '';
+
+        response.on('data', function (chunk) {
+            str += chunk;
+        });
+
+        response.on('end', function () {
+            if (this.statusCode === 200) {
+                res.send(JSON.parse(str).data);
+            }
+            else
+                res.sendStatus(this.statusCode);
+        });
+    });
+
+    togglReq.end();
+});
+
+router.get('/currentEntryDetails', function (req, res, next) {
+    var https = require('https');
+    var options = {
+        host: 'toggl.com',
+        path: '/api/v8/time_entries/current',
+        headers: {
+            'Authorization': 'Basic ' + new Buffer(req.query['apikey'] + ':api_token').toString('base64'),
+            'Content-Type': 'application/json'
+        },
+        method: 'GET'
+    };
+
+    var togglReq = https.request(options, function (response) {
+        var str = '';
+
+        response.on('data', function (chunk) {
+            str += chunk;
+        });
+
+        response.on('end', function () {
+            if (this.statusCode === 200) {
+                res.send(JSON.parse(str).data);
+            }
+            else
+                res.sendStatus(this.statusCode);
+        });
+    });
+
+    togglReq.end();
+});
+
 router.put('/stopTimer', function(req, res, next){
     var https = require('https');
 
@@ -62,8 +124,12 @@ router.put('/stopTimer', function(req, res, next){
             str += chunk;
         });
         
-        response.on('end', function(){
-            res.sendStatus(this.statusCode);
+        response.on('end', function () {
+            if (this.statusCode === 200) {
+                res.send(JSON.parse(str).data);
+            }
+            else
+                res.sendStatus(this.statusCode);
         }); 
     });
     
@@ -89,15 +155,16 @@ router.delete('/discardTimer', function(req, res, next){
         });
 
         response.on('end', function(){
-            console.log('end');
-            res.sendStatus(this.statusCode);
+            if (this.statusCode === 200) {
+                res.send(JSON.parse(str).data);
+            }
+            else
+                res.sendStatus(this.statusCode);
         }); 
     });
     
     togglReq.end();    
 });
-
-
 
 router.post('/startTimer', function (req, res, next) {
     if (req.method != 'POST'){
@@ -131,8 +198,7 @@ router.post('/startTimer', function (req, res, next) {
 
     var togglReq = https.request(options, function(response){
         var str = '';
-        // console.log('inside callback');
-        
+
         response.on('data', function(chunk){ 
             str += chunk;
             // console.log('data: ' + str);

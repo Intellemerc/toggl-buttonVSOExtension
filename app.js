@@ -21,9 +21,6 @@ var toggl = require('./routes/togglButtonForm')
 
 var app = express();
 
-var appInsights = require("applicationinsights")
-appInsights.setup("41d530f7-d600-4fe0-8790-86eb104c5542")
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
