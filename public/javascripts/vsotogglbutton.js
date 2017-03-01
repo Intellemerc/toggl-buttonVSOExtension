@@ -31,7 +31,7 @@ var TogglButtonForm = (function () {
         $('#btnDiscard').click(function () {
             self.discardCurrentTimer();
         });
-        $('#txtDescription').val(this.workItem.fields["System.Title"] + " (id: " + this.workItem.id + ")");
+        $('#txtDescription').val("#" + this.workItem.id + ": " + this.workItem.fields["System.Title"]);
         this.loadAPIKey();
         $('#txtAPIKey').on('change', function () {
             self.hideInfosFromToggl();
@@ -143,6 +143,7 @@ var TogglButtonForm = (function () {
             method: 'PUT',
             data: { timeEntryId: $('#activeActivityStartTime').data('timeentryid'), apikey: $('#txtAPIKey').val() },
             success: function (data) {
+                self.addCompletedTime(data.duration);
                 self.initializeForm();
             },
             error: function (data) {
@@ -160,6 +161,7 @@ var TogglButtonForm = (function () {
             method: 'DELETE',
             data: { timeEntryId: $('#activeActivityStartTime').data('timeentryid'), apikey: $('#txtAPIKey').val() },
             success: function (data) {
+                alert('Timer stopped, time not logged');
                 self.initializeForm();
             },
             error: function (data) {
@@ -184,6 +186,12 @@ var TogglButtonForm = (function () {
             if (apiKey)
                 $('#txtAPIKey').val(apiKey);
         }
+    };
+    TogglButtonForm.prototype.getAPIKey = function () {
+        if (localStorage !== undefined) {
+            return localStorage.getItem(this.togglApiTokenKey);
+        }
+        return '';
     };
     TogglButtonForm.prototype.errorMessage = function (status, message) {
         if (status === void 0) { status = 200; }
@@ -259,6 +267,56 @@ var TogglButtonForm = (function () {
         }
     };
     ;
+    TogglButtonForm.prototype.addCompletedTime = function (duration) {
+        var durationInHours = duration / 3600;
+        var workItemId = this.workItem.id;
+        var apiURI = this.webContext.collection.uri + '_apis/wit/workitems/' + this.workItem.id + '?api-version=1.0';
+        VSS.require(["VSS/Service",
+            "TFS/WorkItemTracking/RestClient",
+            "TFS/WorkItemTracking/Contracts",
+            "VSS/Authentication/Services"], function (VSS_Service, TFS_Wit_WebApi, TFS_Wit_Contracts, AuthenticationService) {
+            var witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+            witClient.getWorkItem(workItemId, undefined, undefined, TFS_Wit_Contracts.WorkItemExpand.Relations)
+                .then(function (workItem) {
+                var completedTime = workItem.fields['Microsoft.VSTS.Scheduling.CompletedWork'];
+                if (completedTime)
+                    completedTime += durationInHours;
+                else
+                    completedTime = durationInHours;
+                var authTokenManager = AuthenticationService.authTokenManager;
+                authTokenManager.getToken()
+                    .then(function (token) {
+                    var header = authTokenManager.getAuthorizationHeader(token);
+                    $.ajaxSetup({ headers: { 'Authorization': header } });
+                    var postData = [{
+                            'op': 'add',
+                            'path': '/fields/System.History',
+                            'value': 'Toggl.com timer stopped at: ' + new Date().toISOString() + ', logged: ' + durationInHours + ' hours'
+                        },
+                        {
+                            'op': 'add',
+                            'path': '/fields/Microsoft.VSTS.Scheduling.CompletedWork',
+                            'value': completedTime
+                        }];
+                    $.ajax({
+                        type: 'PATCH',
+                        url: apiURI,
+                        contentType: 'application/json-patch+json',
+                        data: JSON.stringify(postData),
+                        success: function (data) {
+                            if (console)
+                                console.log('History updated successful');
+                            alert('Timer stopped, logged: ' + durationInHours + ', total time: ' + completedTime);
+                        },
+                        error: function (error) {
+                            if (console)
+                                console.log('Error ' + error.status + ': ' + error.statusText);
+                        }
+                    });
+                });
+            });
+        });
+    };
     return TogglButtonForm;
 })();
 //---------------------------------------------------------------------
@@ -303,13 +361,12 @@ var TogglButtonDialogLauncher = (function () {
                         height: 400,
                         okText: "Start",
                         okCallback: function (result) {
-                            /// TODO: Call Toggl.com to start the activity
-                            console.log('Starting time in toggl.com');
+                            console.log('Start tracking time at toggl.com');
                             $.ajax({
                                 url: './togglButtonForm/startTimer',
                                 method: 'POST',
                                 data: result,
-                                success: function (data) {
+                                success: function (startTimerData) {
                                     alert('Timer started successfully');
                                     $('li[command="TogglButton"]').find('img').attr('src', 'https://localhost:43000/images/active-16.png');
                                     var authTokenManager = AuthenticationService.authTokenManager;
@@ -320,7 +377,7 @@ var TogglButtonDialogLauncher = (function () {
                                         var postData = [{
                                                 'op': 'add',
                                                 'path': '/fields/System.History',
-                                                'value': 'Toggl.com timer started'
+                                                'value': 'Toggl.com timer started at: ' + new Date().toISOString()
                                             }];
                                         if (result.nextState) {
                                             postData = postData.concat([{
@@ -329,7 +386,7 @@ var TogglButtonDialogLauncher = (function () {
                                                     'value': result.nextState
                                                 }]);
                                         }
-                                        var apiURI = webContext.collection.uri + "_apis/wit/workitems/" + workItem.id + "?api-version=1.0";
+                                        var apiURI = webContext.collection.uri + '_apis/wit/workitems/' + workItem.id + '?api-version=1.0';
                                         $.ajax({
                                             type: 'PATCH',
                                             url: apiURI,
@@ -364,6 +421,8 @@ var TogglButtonDialogLauncher = (function () {
                     dialogSvc.openDialog(dialogContributionId, dialogOptions, contributionContext).then(function (dialog) {
                         dialog.getContributionInstance("TogglButtonForm").then(function (togglButtonFormInstance) {
                             togglBtnForm = togglButtonFormInstance;
+                            togglBtnForm.workItem = workItem;
+                            togglBtnForm.webContext = webContext;
                             togglBtnForm.onFormChanged(function (formInput) {
                                 dialog.updateOkButton(formInput.primaryId > 0);
                             });

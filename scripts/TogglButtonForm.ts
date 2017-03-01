@@ -1,14 +1,14 @@
- //---------------------------------------------------------------------
- // <copyright file="TogglButtonForm.ts">
- //    This code is licensed under the MIT License.
- //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF 
- //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED 
- //    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
- //    PARTICULAR PURPOSE AND NONINFRINGEMENT.
- // </copyright>
- // <summary>All logic inside TogglButtonForm</summary>
- //---------------------------------------------------------------------
- 
+//---------------------------------------------------------------------
+// <copyright file="TogglButtonForm.ts">
+//    This code is licensed under the MIT License.
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF 
+//    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED 
+//    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+//    PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// </copyright>
+// <summary>All logic inside TogglButtonForm</summary>
+//---------------------------------------------------------------------
+
 /// <reference path='ref/jquery.d.ts' />
 /// <reference path='ref/VSS.d.ts' />
 /// <reference path='ref/chosen.d.ts' />
@@ -48,23 +48,23 @@ class TogglButtonForm {
     initializeForm() {
         var self = this;
 
-        $('#btnRefresh').click(function() {
+        $('#btnRefresh').click(function () {
             self.fetchTogglInformations();
         });
 
-        $('#btnStop').click(function() {
+        $('#btnStop').click(function () {
             self.stopCurrentTimer();
         });
 
-        $('#btnDiscard').click(function() {
+        $('#btnDiscard').click(function () {
             self.discardCurrentTimer();
         });
 
-        $('#txtDescription').val(this.workItem.fields["System.Title"] + " (id: " + this.workItem.id + ")");
+        $('#txtDescription').val("#" + this.workItem.id + ": " + this.workItem.fields["System.Title"]);
 
         this.loadAPIKey();
 
-        $('#txtAPIKey').on('change', function() {
+        $('#txtAPIKey').on('change', function () {
             self.hideInfosFromToggl();
         });
 
@@ -97,10 +97,10 @@ class TogglButtonForm {
                     if (reason === "New" || reason === "Investigation Complete")//Agile
                         nextState = "Active";
                 }
-                else if (currentState === "Proposed") { 
+                else if (currentState === "Proposed") {
                     nextState = "Active";
                 }
-                else if (currentState === "Approved") { 
+                else if (currentState === "Approved") {
                     nextState = "Committed";
                 }
                 break;
@@ -134,7 +134,7 @@ class TogglButtonForm {
         $('#tags').show();
         $('#tagsSelect').chosen();
         $('#btnRefresh').hide();
-        
+
         this.setNextState();
     }
 
@@ -143,14 +143,14 @@ class TogglButtonForm {
         $.ajax({
             url: './togglButtonForm/getUserData',
             data: { apikey: $('#txtAPIKey').val() },
-            success: function(data) {
+            success: function (data) {
                 self.errorMessage(null);
                 var currentTimer = null;
-                
+
                 if (data.time_entries) {
-                    currentTimer = data.time_entries.find(function(t) { return t.duration < 0; });
+                    currentTimer = data.time_entries.find(function (t) { return t.duration < 0; });
                 }
-                
+
                 if (currentTimer) {
                     self.showCurrentTimer(currentTimer);
                 } else {
@@ -160,7 +160,7 @@ class TogglButtonForm {
                 }
                 self.saveAPIKey();
             },
-            error: function(data) {
+            error: function (data) {
                 self.errorMessage(data.status, data.statusText);
             }
         });
@@ -181,10 +181,11 @@ class TogglButtonForm {
             url: './togglButtonForm/stopTimer',
             method: 'PUT',
             data: { timeEntryId: $('#activeActivityStartTime').data('timeentryid'), apikey: $('#txtAPIKey').val() },
-            success: function(data) {
+            success: function (data) {
+                self.addCompletedTime(data.duration);
                 self.initializeForm();
             },
-            error: function(data) {
+            error: function (data) {
                 self.errorMessage(data.status, data.statusText);
             }
         });
@@ -200,10 +201,11 @@ class TogglButtonForm {
             url: './togglButtonForm/discardTimer',
             method: 'DELETE',
             data: { timeEntryId: $('#activeActivityStartTime').data('timeentryid'), apikey: $('#txtAPIKey').val() },
-            success: function(data) {
+            success: function (data) {
+                alert('Timer stopped, time not logged');
                 self.initializeForm();
             },
-            error: function(data) {
+            error: function (data) {
                 self.errorMessage(data.status, data.statusText);
             }
         })
@@ -230,6 +232,14 @@ class TogglButtonForm {
         }
     }
 
+    getAPIKey(): string {
+        if (localStorage !== undefined) {
+            return localStorage.getItem(this.togglApiTokenKey);
+        }
+
+        return '';
+    }
+
     errorMessage(status: number = 200, message: string = '') {
         var $errorDiv = $('#error');
 
@@ -243,7 +253,7 @@ class TogglButtonForm {
         var $tagSelect = $('#tagsSelect');
         $tagSelect.find("option[value!='']").remove();
 
-        tags.forEach(function(tag) {
+        tags.forEach(function (tag) {
             var $option = $('<option>', {
                 value: tag.name,
                 text: tag.name
@@ -253,7 +263,7 @@ class TogglButtonForm {
     }
 
     fillProjectsAndClientsInfo(clients, projects) {
-        projects = projects.filter(function(project) {
+        projects = projects.filter(function (project) {
             return project.server_deleted_at == undefined;
         });
 
@@ -262,11 +272,11 @@ class TogglButtonForm {
         //$projects.find("option[value!='']").remove();
         $projects.find("option").remove();
 
-        clients.forEach(function(client) {
+        clients.forEach(function (client) {
             var $optGroup = $('<optGroup>', { label: client.name });
-            projects.filter(function(project) {
+            projects.filter(function (project) {
                 return project.cid === client.id;
-            }).forEach(function(project) {
+            }).forEach(function (project) {
                 var $opt = $('<option>', {
                     value: project.id,
                     text: project.name
@@ -277,14 +287,14 @@ class TogglButtonForm {
             $projects.append($optGroup);
         });
 
-        var withoutClients = projects.filter(function(project) {
+        var withoutClients = projects.filter(function (project) {
             return project.cid == undefined;
         });
 
         if (withoutClients.length > 0) {
             var $optNoClient = $('<optGroup>', { label: 'No client' });
 
-            withoutClients.forEach(function(project) {
+            withoutClients.forEach(function (project) {
                 var $opt = $('<option>', {
                     value: project.id,
                     text: project.name
@@ -315,4 +325,60 @@ class TogglButtonForm {
         }
 
     };
+
+    addCompletedTime(duration: number) {
+        var durationInHours = duration / 3600;
+
+        var workItemId = this.workItem.id;
+        var apiURI = this.webContext.collection.uri + '_apis/wit/workitems/' + this.workItem.id + '?api-version=1.0';
+
+        VSS.require(["VSS/Service",
+            "TFS/WorkItemTracking/RestClient",
+            "TFS/WorkItemTracking/Contracts",
+            "VSS/Authentication/Services"],
+            function (VSS_Service, TFS_Wit_WebApi, TFS_Wit_Contracts, AuthenticationService) {
+                var witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+                witClient.getWorkItem(workItemId, undefined, undefined, TFS_Wit_Contracts.WorkItemExpand.Relations)
+                    .then(function (workItem) {
+                        var completedTime: number = workItem.fields['Microsoft.VSTS.Scheduling.CompletedWork'];
+
+                        if (completedTime)
+                            completedTime += durationInHours;
+                        else
+                            completedTime = durationInHours;
+
+                        var authTokenManager = AuthenticationService.authTokenManager;
+                        authTokenManager.getToken()
+                            .then(function (token) {
+                                var header = authTokenManager.getAuthorizationHeader(token);
+                                $.ajaxSetup({ headers: { 'Authorization': header } });
+
+                                var postData = [{
+                                    'op': 'add',
+                                    'path': '/fields/System.History',
+                                    'value': 'Toggl.com timer stopped at: ' + new Date().toISOString() + ', logged: ' + durationInHours + ' hours'
+                                },
+                                {
+                                    'op': 'add',
+                                    'path': '/fields/Microsoft.VSTS.Scheduling.CompletedWork',
+                                    'value': completedTime
+                                }];
+
+                                $.ajax({
+                                    type: 'PATCH',
+                                    url: apiURI,
+                                    contentType: 'application/json-patch+json',
+                                    data: JSON.stringify(postData),
+                                    success: function (data) {
+                                        if (console) console.log('History updated successful');
+                                        alert('Timer stopped, logged: ' + durationInHours + ', total time: ' + completedTime);
+                                    },
+                                    error: function (error) {
+                                        if (console) console.log('Error ' + error.status + ': ' + error.statusText);
+                                    }
+                                })
+                            });
+                    });
+            });
+    }
 }
