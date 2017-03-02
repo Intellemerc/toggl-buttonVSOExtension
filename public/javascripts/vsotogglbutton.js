@@ -116,8 +116,10 @@ var TogglButtonForm = (function () {
                     self.showCurrentTimer(currentTimer);
                 }
                 else {
-                    self.fillTagsInfo(data.tags);
-                    self.fillProjectsAndClientsInfo(data.clients, data.projects);
+                    if (data.tags)
+                        self.fillTagsInfo(data.tags);
+                    if (data.clients && data.projects)
+                        self.fillProjectsAndClientsInfo(data.clients, data.projects);
                     self.showInfosFromToggl();
                 }
                 self.saveAPIKey();
@@ -204,15 +206,13 @@ var TogglButtonForm = (function () {
     TogglButtonForm.prototype.fillTagsInfo = function (tags) {
         var $tagSelect = $('#tagsSelect');
         $tagSelect.find("option[value!='']").remove();
-        if (tags) {
-            tags.forEach(function (tag) {
-                var $option = $('<option>', {
-                    value: tag.name,
-                    text: tag.name
-                });
-                $tagSelect.append($option);
+        tags.forEach(function (tag) {
+            var $option = $('<option>', {
+                value: tag.name,
+                text: tag.name
             });
-        }
+            $tagSelect.append($option);
+        });
     };
     TogglButtonForm.prototype.fillProjectsAndClientsInfo = function (clients, projects) {
         projects = projects.filter(function (project) {
