@@ -62,13 +62,13 @@ block content
 				
 		#apiKey.section
 			div(class='labelTitle')
-				p Toggl API Key
+				p Toggl API Key (get it from: toggl.com - SignUp - User Profile)
 			div
 				input(type='password' class='textBox' id='txtAPIKey' placeholder='Toggl API Key' value='')  			
 				
 		#btnRefresh.buttonDiv
 			span
-				button(class='btn' id='btnRefresh') Refresh
+				button(class='btn' id='btnRefresh') Save
 				
 		#changeWIState.section
 			label
@@ -78,6 +78,15 @@ block content
 				
 		#error.section
 			span.error
+
+		#issues.section
+			div(class='labelTitle')
+				p Time Tracker Help
+			div(class='labelTitle')
+				a(href="http://github.com/nevalenny/toggl-buttonVSOExtension") Project on Github (README)
+			div(class='labelTitle')
+				a(href="http://github.com/nevalenny/toggl-buttonVSOExtension/issues") Report issues here
+
 	#stopTimer.section
 		div(class='stopDiv')
 			p Active Timer: 

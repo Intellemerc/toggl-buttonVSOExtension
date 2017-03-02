@@ -268,7 +268,7 @@ var TogglButtonForm = (function () {
     };
     ;
     TogglButtonForm.prototype.addCompletedTime = function (duration) {
-        var durationInHours = duration / 3600;
+        var durationInHours = Math.round(duration / 3.6) / 1000;
         var workItemId = this.workItem.id;
         var apiURI = this.webContext.collection.uri + '_apis/wit/workitems/' + this.workItem.id + '?api-version=1.0';
         VSS.require(["VSS/Service",
@@ -283,6 +283,7 @@ var TogglButtonForm = (function () {
                     completedTime += durationInHours;
                 else
                     completedTime = durationInHours;
+                completedTime = Math.round(completedTime * 1000) / 1000;
                 var authTokenManager = AuthenticationService.authTokenManager;
                 authTokenManager.getToken()
                     .then(function (token) {
@@ -306,7 +307,7 @@ var TogglButtonForm = (function () {
                         success: function (data) {
                             if (console)
                                 console.log('History updated successful');
-                            alert('Timer stopped, logged: ' + durationInHours + ', total time: ' + completedTime);
+                            window.location.reload(true);
                         },
                         error: function (error) {
                             if (console)
@@ -367,7 +368,6 @@ var TogglButtonDialogLauncher = (function () {
                                 method: 'POST',
                                 data: result,
                                 success: function (startTimerData) {
-                                    alert('Timer started successfully');
                                     $('li[command="TogglButton"]').find('img').attr('src', 'https://localhost:43000/images/active-16.png');
                                     var authTokenManager = AuthenticationService.authTokenManager;
                                     authTokenManager.getToken()
@@ -395,6 +395,7 @@ var TogglButtonDialogLauncher = (function () {
                                             success: function (data) {
                                                 if (console)
                                                     console.log('History updated successful');
+                                                window.location.reload(true);
                                             },
                                             error: function (error) {
                                                 if (console)

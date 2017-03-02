@@ -327,7 +327,7 @@ class TogglButtonForm {
     };
 
     addCompletedTime(duration: number) {
-        var durationInHours = duration / 3600;
+        var durationInHours = Math.round(duration / 3.6) / 1000;
 
         var workItemId = this.workItem.id;
         var apiURI = this.webContext.collection.uri + '_apis/wit/workitems/' + this.workItem.id + '?api-version=1.0';
@@ -346,6 +346,8 @@ class TogglButtonForm {
                             completedTime += durationInHours;
                         else
                             completedTime = durationInHours;
+
+                        completedTime = Math.round(completedTime * 1000) / 1000;
 
                         var authTokenManager = AuthenticationService.authTokenManager;
                         authTokenManager.getToken()
@@ -371,7 +373,7 @@ class TogglButtonForm {
                                     data: JSON.stringify(postData),
                                     success: function (data) {
                                         if (console) console.log('History updated successful');
-                                        alert('Timer stopped, logged: ' + durationInHours + ', total time: ' + completedTime);
+                                        window.location.reload(true);
                                     },
                                     error: function (error) {
                                         if (console) console.log('Error ' + error.status + ': ' + error.statusText);

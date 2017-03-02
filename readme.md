@@ -3,6 +3,11 @@
 Do you have a good way to track the time you spend in an activity? How to summarize the information about how much time you spend in a project and do some great reports to give to your clients or managers?
 [toggl.com](http://toggl.com) is the best way to track your time and focus on what is important. Integrate [toggl.com](http://toggl.com) with Visual Studio Team Services work items and improve your productivity.
 
+## Features
+1. Start timer with VSTS task/bug id and title
+1. Stop timer and add duration to Completed time in VSTS task/bug
+1. Log start/stop events in task history timeline (comments)
+
 ## Quick steps to get started 
 1. Signup at [toggl.com](http://toggl.com) website;
 1. Configure your projects and clients in toggl.com website;
@@ -11,7 +16,7 @@ Do you have a good way to track the time you spend in an activity? How to summar
   
 ![TogglButton](images/screen1-small.png)
 
-1. Paste Toggl API Key in the corresponding field and click in "Refresh" (if you will, you need to do this only once per user/browser);
+1. Paste Toggl API Key in the corresponding field and click in "Save" (if you will, you need to do this only once per user/browser);
 1. Choose a Client/Project and tags for your activity;
 1. Click in "Start" and begin your work;  
   

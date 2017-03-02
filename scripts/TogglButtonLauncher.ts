@@ -56,8 +56,6 @@ class TogglButtonDialogLauncher {
                                         method: 'POST',
                                         data: result,
                                         success: function(startTimerData) {
-                                            alert('Timer started successfully');
-
                                             $('li[command="TogglButton"]').find('img').attr('src', 'https://localhost:43000/images/active-16.png')
                                             
                                             var authTokenManager = AuthenticationService.authTokenManager;
@@ -89,6 +87,7 @@ class TogglButtonDialogLauncher {
                                                         data: JSON.stringify(postData),
                                                         success: function(data){
                                                             if (console) console.log('History updated successful');
+                                                            window.location.reload(true);
                                                         },
                                                         error: function(error){
                                                             if (console) console.log('Error ' + error.status + ': ' + error.statusText);                                                            
