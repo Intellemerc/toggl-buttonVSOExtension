@@ -253,13 +253,15 @@ class TogglButtonForm {
         var $tagSelect = $('#tagsSelect');
         $tagSelect.find("option[value!='']").remove();
 
-        tags.forEach(function (tag) {
-            var $option = $('<option>', {
-                value: tag.name,
-                text: tag.name
+        if (tags) {
+            tags.forEach(function (tag) {
+                var $option = $('<option>', {
+                    value: tag.name,
+                    text: tag.name
+                });
+                $tagSelect.append($option);
             });
-            $tagSelect.append($option);
-        });
+        }
     }
 
     fillProjectsAndClientsInfo(clients, projects) {

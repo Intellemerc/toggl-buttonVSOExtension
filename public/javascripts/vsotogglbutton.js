@@ -204,13 +204,15 @@ var TogglButtonForm = (function () {
     TogglButtonForm.prototype.fillTagsInfo = function (tags) {
         var $tagSelect = $('#tagsSelect');
         $tagSelect.find("option[value!='']").remove();
-        tags.forEach(function (tag) {
-            var $option = $('<option>', {
-                value: tag.name,
-                text: tag.name
+        if (tags) {
+            tags.forEach(function (tag) {
+                var $option = $('<option>', {
+                    value: tag.name,
+                    text: tag.name
+                });
+                $tagSelect.append($option);
             });
-            $tagSelect.append($option);
-        });
+        }
     };
     TogglButtonForm.prototype.fillProjectsAndClientsInfo = function (clients, projects) {
         projects = projects.filter(function (project) {
@@ -307,7 +309,7 @@ var TogglButtonForm = (function () {
                         success: function (data) {
                             if (console)
                                 console.log('History updated successful');
-                            window.location.reload(true);
+                            window.location.reload();
                         },
                         error: function (error) {
                             if (console)
@@ -395,7 +397,7 @@ var TogglButtonDialogLauncher = (function () {
                                             success: function (data) {
                                                 if (console)
                                                     console.log('History updated successful');
-                                                window.location.reload(true);
+                                                window.location.reload();
                                             },
                                             error: function (error) {
                                                 if (console)
