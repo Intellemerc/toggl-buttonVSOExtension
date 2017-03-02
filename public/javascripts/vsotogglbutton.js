@@ -309,7 +309,7 @@ var TogglButtonForm = (function () {
                         success: function (data) {
                             if (console)
                                 console.log('History updated successful');
-                            window.location.reload();
+                            document.location.reload();
                         },
                         error: function (error) {
                             if (console)
@@ -397,7 +397,7 @@ var TogglButtonDialogLauncher = (function () {
                                             success: function (data) {
                                                 if (console)
                                                     console.log('History updated successful');
-                                                window.location.reload();
+                                                document.location.reload();
                                             },
                                             error: function (error) {
                                                 if (console)
