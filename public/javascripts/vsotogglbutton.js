@@ -358,8 +358,8 @@ var TogglButtonDialogLauncher = (function () {
                     //dialog options
                     var dialogOptions = {
                         title: dialogTitle,
-                        width: 400,
-                        height: 400,
+                        width: 500,
+                        height: 600,
                         okText: "Start",
                         okCallback: function (result) {
                             console.log('Start tracking time at toggl.com');

@@ -373,7 +373,7 @@ class TogglButtonForm {
                                     data: JSON.stringify(postData),
                                     success: function (data) {
                                         if (console) console.log('History updated successful');
-                                        window.location.reload(true);
+                                        window.location.reload();
                                     },
                                     error: function (error) {
                                         if (console) console.log('Error ' + error.status + ': ' + error.statusText);

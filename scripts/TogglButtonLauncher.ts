@@ -45,8 +45,8 @@ class TogglButtonDialogLauncher {
                             //dialog options
                             var dialogOptions = {
                                 title: dialogTitle,
-                                width: 400,
-                                height: 400,
+                                width: 500,
+                                height: 600,
                                 okText: "Start",
                                 okCallback: function(result: ITogglFormResponse) {
                                     
@@ -87,7 +87,7 @@ class TogglButtonDialogLauncher {
                                                         data: JSON.stringify(postData),
                                                         success: function(data){
                                                             if (console) console.log('History updated successful');
-                                                            window.location.reload(true);
+                                                            window.location.reload();
                                                         },
                                                         error: function(error){
                                                             if (console) console.log('Error ' + error.status + ': ' + error.statusText);                                                            
