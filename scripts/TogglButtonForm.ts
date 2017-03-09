@@ -154,8 +154,8 @@ class TogglButtonForm {
                 if (currentTimer) {
                     self.showCurrentTimer(currentTimer);
                 } else {
-                    if(data.tags) self.fillTagsInfo(data.tags);
-                    if(data.clients && data.projects) self.fillProjectsAndClientsInfo(data.clients, data.projects);
+                    if (data.tags) self.fillTagsInfo(data.tags);
+                    if (data.clients && data.projects) self.fillProjectsAndClientsInfo(data.clients, data.projects);
                     self.showInfosFromToggl();
                 }
                 self.saveAPIKey();
@@ -347,7 +347,25 @@ class TogglButtonForm {
                         else
                             completedTime = durationInHours;
 
-                        completedTime = Math.round(completedTime * 1000) / 1000;
+                        var remainingTime: number = workItem.fields['Microsoft.VSTS.Scheduling.RemainingWork'];
+                        var estimatedTime: number = workItem.fields['Microsoft.VSTS.Scheduling.OriginalEstimate'];
+
+                        if (remainingTime) {
+                            remainingTime -= durationInHours;
+                        }
+                        else {
+                            if (estimatedTime) {
+                                remainingTime = estimatedTime - durationInHours;
+                            }
+                        }
+
+                        completedTime = Math.round(completedTime * 100) / 100;
+                        remainingTime = Math.round(remainingTime * 100) / 100;
+
+                        if(remainingTime < 0)
+                        {
+                            remainingTime = 0;
+                        }
 
                         var authTokenManager = AuthenticationService.authTokenManager;
                         authTokenManager.getToken()
@@ -364,6 +382,11 @@ class TogglButtonForm {
                                     'op': 'add',
                                     'path': '/fields/Microsoft.VSTS.Scheduling.CompletedWork',
                                     'value': completedTime
+                                },
+                                {
+                                    'op': 'add',
+                                    'path': '/fields/Microsoft.VSTS.Scheduling.RemainingWork',
+                                    'value': remainingTime
                                 }];
 
                                 $.ajax({

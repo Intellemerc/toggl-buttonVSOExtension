@@ -285,7 +285,21 @@ var TogglButtonForm = (function () {
                     completedTime += durationInHours;
                 else
                     completedTime = durationInHours;
-                completedTime = Math.round(completedTime * 1000) / 1000;
+                var remainingTime = workItem.fields['Microsoft.VSTS.Scheduling.RemainingWork'];
+                var estimatedTime = workItem.fields['Microsoft.VSTS.Scheduling.OriginalEstimate'];
+                if (remainingTime) {
+                    remainingTime -= durationInHours;
+                }
+                else {
+                    if (estimatedTime) {
+                        remainingTime = estimatedTime - durationInHours;
+                    }
+                }
+                completedTime = Math.round(completedTime * 100) / 100;
+                remainingTime = Math.round(remainingTime * 100) / 100;
+                if (remainingTime < 0) {
+                    remainingTime = 0;
+                }
                 var authTokenManager = AuthenticationService.authTokenManager;
                 authTokenManager.getToken()
                     .then(function (token) {
@@ -300,6 +314,11 @@ var TogglButtonForm = (function () {
                             'op': 'add',
                             'path': '/fields/Microsoft.VSTS.Scheduling.CompletedWork',
                             'value': completedTime
+                        },
+                        {
+                            'op': 'add',
+                            'path': '/fields/Microsoft.VSTS.Scheduling.RemainingWork',
+                            'value': remainingTime
                         }];
                     $.ajax({
                         type: 'PATCH',
